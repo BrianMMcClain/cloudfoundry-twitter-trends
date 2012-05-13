@@ -1,3 +1,0 @@
-[submodule "farmer/node_modules/twitter-stream-node"]
-	path = farmer/node_modules/twitter-stream-node
-	url = https://github.com/BrianMMcClain/twitter-stream-node.git
