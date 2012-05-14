@@ -1,5 +1,4 @@
 var amqp = require('amqp');
-var htmlEscape = require('sanitizer/sanitizer').escape;
 
 var stream = require('./lib/twitter-stream-node/lib/stream');
 
