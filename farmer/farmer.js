@@ -16,14 +16,14 @@ function rabbitUrl() {
 
 function setup() {
 
-  var exchange = conn.exchange('twitter-farmer', {'type': 'fanout', durable: false}, function() {
+  var exchange = conn.exchange('twitter-trends', {'type': 'fanout', durable: false}, function() {
 
-    var queue = conn.queue('', {durable: false, exclusive: true},
+    var queue = conn.queue('', {durable: false},
     function() {
       queue.subscribe(function(msg) {
         console.log(msg);
       });
-      queue.bind(exchange.name, '');
+      queue.bind(exchange.name, 'tweets');
     });
     queue.on('queueBindOk', function() { gatherTweets(exchange); });
   });
