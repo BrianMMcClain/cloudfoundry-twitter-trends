@@ -16,9 +16,9 @@ function rabbitUrl() {
 
 function setup() {
 
-  var exchange = conn.exchange('twitter-trends', {'type': 'fanout', durable: false}, function() {
+  var exchange = conn.exchange('twitter-trends-analyze', {durable: true}, function() {
 
-    var queue = conn.queue('', {durable: false},
+    var queue = conn.queue('', {durable: true},
     function() {
       queue.subscribe(function(msg) {
         console.log(msg);

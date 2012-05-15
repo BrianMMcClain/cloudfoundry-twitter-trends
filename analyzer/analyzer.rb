@@ -29,7 +29,7 @@ def client
 end
 
 def trends_exchange
-  $nameless_exchange ||= client.exchange('twitter-trends')
+  $exchange ||= client.exchange('twitter-trends-analyze')
 end
 
 def messages_queue
@@ -38,7 +38,7 @@ def messages_queue
 end
 
 puts "Subscribing to message_queue..."
-messages_queue.subscribe(:ack => false, :timeout => 10) do |msg|
+messages_queue.subscribe(:ack => true, :message_max => 1, :timeout => 10, :durable => true) do |msg|
     puts msg
 end
 puts "done!"
