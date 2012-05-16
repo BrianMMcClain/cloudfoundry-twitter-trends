@@ -1,7 +1,0 @@
-{
-    "name":"cloudfoundry-twitter-trends-farmer",
-    "version":"0.0.1",
-    "dependencies": {
-        "amqp":">= 0.1.0"
-    }
-}
