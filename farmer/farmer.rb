@@ -1,5 +1,29 @@
 require 'tweetstream'
-require "json"
+require 'json'
+require 'bunny'
+
+def amqp_url
+  if (ENV["VCAP_SERVICES"])
+    services = JSON.parse(ENV['VCAP_SERVICES'], :symbolize_names => true)
+    url = services.values.map do |srvs|
+      srvs.map do |srv|
+        if srv[:label] =~ /^rabbitmq-/
+          srv[:credentials][:url]
+        else
+          []
+        end
+      end
+    end.flatten!.first
+  else
+    return "amqp://localhost"
+  end
+end
+
+# Setup AMQP Messaging
+b = Bunny.new
+b.start
+#exch = b.exchange('tweets').delete
+exch = b.exchange('tweets', :type => :fanout)
 
 # Read in the config file
 configJson = File.read('config.json')
@@ -16,4 +40,6 @@ end
 
 TweetStream::Client.new.sample do |status|
   puts "#{status.text}"
+  # Publish the tweet to the queue
+  exch.publish(status.text)
 end

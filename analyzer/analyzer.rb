@@ -1,6 +1,7 @@
 require 'redis'
 require 'bunny'
 require 'json'
+require 'uuid'
 
 def amqp_url
   if (ENV["VCAP_SERVICES"])
@@ -19,27 +20,19 @@ def amqp_url
   end
 end
 
-def client
-  unless $client
-    c = Bunny.new(amqp_url)
-    c.start
-    $client = c
-  end
-  $client
-end
+# Setup AMQP Messaging
+b = Bunny.new
+b.start
+#exch = b.exchange('tweets').delete
+exch = b.exchange('tweets', :type => :fanout)
+uuid = UUID.new
+queue_name = "tweet-analyzer-#{uuid.generate(:compact)}"
+q = b.queue(queue_name)
+q.bind(exch)
 
-def trends_exchange
-  $exchange ||= client.exchange('twitter-trends-analyze')
-end
-
-def messages_queue
-  $messages_queue ||= client.queue("tweets")
-  $messages_queue.exchange(trends_exchange)
-end
-
-puts "Subscribing to message_queue..."
-messages_queue.subscribe(:ack => true, :message_max => 1, :timeout => 10, :durable => true) do |msg|
-    puts msg
+puts "Subscribing to #{queue_name}"
+q.subscribe do |msg|
+    puts msg[:payload]
 end
 puts "done!"
 
